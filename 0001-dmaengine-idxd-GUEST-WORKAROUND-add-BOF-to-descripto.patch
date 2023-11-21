@@ -1,0 +1,34 @@
+From b276b19978a3b8a30fd8f80bce45b9b07dc98d46 Mon Sep 17 00:00:00 2001
+From: Yan Zhao <yan.y.zhao@intel.com>
+Date: Mon, 11 Sep 2023 13:44:40 +0800
+Subject: [PATCH] dmaengine/idxd: GUEST WORKAROUND: add BOF to descriptor flags
+ for IOPF
+
+To support IOPF in IOMMU second level page table, workload descriptors in
+guest needs to turn on BOF (block on fault).
+
+Hack the guest DSA driver to add BOF flag in workload descriptor if wq BOF
+flag is on
+
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+---
+ drivers/dma/idxd/submit.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/dma/idxd/submit.c b/drivers/dma/idxd/submit.c
+index c01db23e3333..a65723ac4746 100644
+--- a/drivers/dma/idxd/submit.c
++++ b/drivers/dma/idxd/submit.c
+@@ -174,6 +174,9 @@ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc)
+ 	if (idxd->state != IDXD_DEV_ENABLED)
+ 		return -EIO;
+ 
++	if (wq->wqcfg->bof)
++		desc_flags = desc->hw->flags |= IDXD_OP_FLAG_BOF;
++
+ 	if (!percpu_ref_tryget_live(&wq->wq_active)) {
+ 		wait_for_completion(&wq->wq_resurrect);
+ 		if (!percpu_ref_tryget_live(&wq->wq_active))
+-- 
+2.17.1
+
