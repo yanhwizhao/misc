@@ -25,7 +25,7 @@ echo 1 > $DSA_CONFIG_PATH/dsa0/wq0.0/block_on_fault
 
 echo "kernel" > $DSA_CONFIG_PATH/dsa0/wq0.0/type
 echo "dmaengine" > $DSA_CONFIG_PATH/dsa0/wq0.0/name
-#echo "15" > $DSA_CONFIG_PATH/dsa0/wq0.0/threshold
+echo "dmaengine" > $DSA_CONFIG_PATH/dsa0/wq0.0/driver_name
 echo "Engines for group 0"
 cat $DSA_CONFIG_PATH/dsa0/group0.0/engines
 echo "Work queues for group 0"
